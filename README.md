@@ -1,0 +1,1 @@
+First implentation of Conway's game of life.
