@@ -11,7 +11,7 @@ using GLMakie
 # initialize playing field
 function init_grid(N::Int, M::Int)
     grid = bitrand((N, M))
-    return grid, 
+    return grid
 end
 
 
@@ -48,8 +48,8 @@ function generate!(old_grid::BitMatrix)
     return new_grid
 end
 
-# display current generation
-function update_display(grid::BitMatrix)
+# display current generation in command line
+function update_cli(grid::BitMatrix)
     for row in eachrow(grid)
         for item in row
             if item == true
@@ -63,22 +63,28 @@ function update_display(grid::BitMatrix)
     end
 end
 
-# start and run the game iter times
-function run(iters::Int)
+# display current generation in heatmap
+function update_heatmap(hm, grid::BitMatrix)
+    hm[3] = grid
+    return hm
+end
 
+# start and run the game iter times
+function run(iters::Int, N::Int, M::Int)
+    grid = init_grid(N, M)
     fig, ax, hm = GLMakie.heatmap(1:N, 1:M, grid, color=:greys, )
-    grid = initialize(25,25)
+    display(fig)
     for i = 1:iters
-        println("----------", i, "---------")
+        #println("----------", i, "---------")
         grid = generate!(grid)
-        #out = Plots.heatmap!(grid, color=:greys)
         #println(grid)
-        #push!(out, grid)
-        update_display(grid)
+        hm[3] = grid
+        yield()
+        sleep(1/60) 
     end
 end
 
-time_run(N) = @time run(1);
+#time_run(N) = @time run(1);
 
-run(10)
+run(100, 1000, 100)
 end # module game_life
